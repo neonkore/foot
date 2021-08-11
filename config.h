@@ -154,6 +154,7 @@ struct config {
         uint32_t bg;
         uint32_t table[256];
         uint16_t alpha;
+        uint16_t unfocused_alpha;
         uint32_t selection_fg;
         uint32_t selection_bg;
         uint32_t url;

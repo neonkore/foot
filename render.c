@@ -2366,6 +2366,9 @@ grid_render(struct terminal *term)
         term->render.last_buf->height != buf->height ||
         term->flash.active || term->render.was_flashing ||
         term->is_searching != term->render.was_searching ||
+        (term->conf->colors.unfocused_alpha < 0xffff && (
+            !term->kbd_focus ||
+            !term->render.was_focused)) ||
         term->render.margins)
     {
         force_full_repaint(term, buf);
@@ -2392,6 +2395,7 @@ grid_render(struct terminal *term)
     term->render.last_buf = buf;
     term->render.was_flashing = term->flash.active;
     term->render.was_searching = term->is_searching;
+    term->render.was_focused = term->kbd_focus;
 
     shm_addref(buf);
     buf->age = 0;
@@ -2676,6 +2680,22 @@ grid_render(struct terminal *term)
 
     xassert(buf->width % term->scale == 0);
     xassert(buf->height % term->scale == 0);
+
+    if (!term->kbd_focus && term->conf->colors.unfocused_alpha < 0xffff) {
+        pixman_color_t unfocused_alpha =
+            {0, 0, 0, term->conf->colors.unfocused_alpha};
+        pixman_image_t *transparent =
+            pixman_image_create_solid_fill(&unfocused_alpha);
+
+        pixman_image_composite32(
+            PIXMAN_OP_IN_REVERSE, transparent, NULL, buf->pix[0],
+            0, 0, 0, 0, 0, 0, buf->width, buf->height);
+
+        pixman_image_unref(transparent);
+
+        wl_surface_damage_buffer(
+            term->window->surface, 0, 0, buf->width, buf->height);
+    }
 
     wl_surface_attach(term->window->surface, buf->wl_buf, 0, 0);
     wl_surface_commit(term->window->surface);

@@ -144,6 +144,7 @@
 * Mouse buttons 6/7 (mouse wheel left/right).
 * `url.uri-characters` option to `foot.ini`
   (https://codeberg.org/dnkl/foot/issues/654).
+* `colors.unfocused-alpha` to `foot.ini`.
 
 
 ### Changed

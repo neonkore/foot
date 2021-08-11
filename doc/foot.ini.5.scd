@@ -509,6 +509,26 @@ _alpha_ option.
 	Background translucency. A value in the range 0.0-1.0, where 0.0
 	means completely transparent, and 1.0 is opaque. Default: _1.0_.
 
+*unfocused-alpha*
+	Window translucency applied when window does not have keyboard
+	focus. Unlike *alpha*, this option affects everything (all
+	background colors, foreground colors, images etc).
+	
+	Note that *alpha* is also applied.
+	
+	Be aware that there is a performance penalty of using this, as
+	damage tracking is disabled while the window is
+	unfocused. I.e. all screen updates will result in fullscreen
+	repaints. This is not an issue when the window content is static,
+	or updates at a slow pace (e.g. top), but can be noticeable with
+	high amounts of output. Performance is unaffected in focused
+	windows.
+	
+	Valid values are in the range 0.0-1.0, where 0.0 means completely
+	transparent, and 1.0 is opaque.
+	
+	Default: _1.0_
+
 *selection-foreground*, *selection-background*
 	Foreground (text) and background color to use in selected
 	text. Note that *both* options must be set, or the default will be

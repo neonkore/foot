@@ -1359,6 +1359,18 @@ parse_section_colors(const char *key, const char *value, struct config *conf,
         return true;
     }
 
+    else if (strcmp(key, "unfocused-alpha") == 0) {
+        double alpha;
+        if (!str_to_double(value, &alpha) || alpha < 0. || alpha > 1.) {
+            LOG_AND_NOTIFY_ERR("%s:%d: [colors]: unfocused-alpha: expected a value in the range 0.0-1.0",
+                    path, lineno);
+            return false;
+        }
+
+        conf->colors.unfocused_alpha = alpha * 65535.;
+        return true;
+    }
+
     else {
         LOG_AND_NOTIFY_ERR("%s:%d: [colors]: %s: invalid key", path, lineno, key);
         return false;
@@ -2940,6 +2952,7 @@ config_load(struct config *conf, const char *conf_path,
             .fg = default_foreground,
             .bg = default_background,
             .alpha = 0xffff,
+            .unfocused_alpha = 0xffff,
             .selection_fg = 0x80000000,  /* Use default bg */
             .selection_bg = 0x80000000,  /* Use default fg */
             .use_custom = {
