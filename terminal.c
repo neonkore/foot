@@ -2259,6 +2259,14 @@ term_erase_scrollback(struct terminal *term)
     term_damage_view(term);
 }
 
+/*
+ * This UNITTEST block uses functions that don't have PGO stubs; so it could
+ * cause linker errors in PGO builds if the whole block isn't discarded by
+ * the compiler (e.g. when no optimization flags are used). Doing a PGO build
+ * without optimization usually makes very little sense, but we prevent such
+ * errors from happening anyway, by using an #if guard.
+ */
+#if defined(_DEBUG)
 UNITTEST
 {
     const int scrollback_rows = 16;
@@ -2385,6 +2393,7 @@ UNITTEST
     free(term.normal.rows);
     fdm_destroy(fdm);
 }
+#endif
 
 int
 term_row_rel_to_abs(const struct terminal *term, int row)
