@@ -153,6 +153,32 @@ test_bool_option(const char *section, const char *option, const bool *ptr)
 }
 
 static void
+test_enum_option(const char *section, const char *option, size_t count,
+                 const char *values[static count],
+                 const int enums[static count],
+                 const int *ptr)
+{
+    for (size_t i = 0; i < count; i++) {
+        config_free(conf);
+        memset(&conf, 0, sizeof(conf));
+
+        ck_assert(add_string_option(section, option, values[i]));
+        ck_assert(
+            config_load(
+                &conf, conf_file.path, &user_notifications, &overrides, true));
+        ck_assert_int_eq(*ptr, enums[i]);
+    }
+
+    config_free(conf);
+    memset(&conf, 0, sizeof(conf));
+
+    ck_assert(add_string_option(section, option, "not-a-valid-enum"));
+    ck_assert(
+        !config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
+}
+
+static void
 test_pt_or_px_option(const char *section, const char *option,
                      const struct pt_or_px *ptr,
                      bool (*custom_checker)(bool valid,
@@ -237,6 +263,21 @@ START_TEST(config_main_underline_offset)
                          &check_underline_offset);
 }
 
+START_TEST(config_main_box_drawings_uses_font_glyphs)
+{
+    test_bool_option("main", "box-drawings-uses-font-glyphs",
+                     &conf.box_drawings_uses_font_glyphs);
+}
+
+START_TEST(config_main_dpi_aware)
+{
+    test_enum_option(
+        "main", "dpi-aware", 3,
+        (const char *[]){"auto", "yes", "no"},
+        (int []){DPI_AWARE_AUTO, DPI_AWARE_YES, DPI_AWARE_NO},
+        (const int *)&conf.dpi_aware);
+}
+
 START_TEST(config_main_invalid_option)
 {
     static const char *config = "foo=bar\n";
@@ -267,6 +308,8 @@ foot_suite(void)
     tcase_add_test(config, config_main_horizontal_letter_offset);
     tcase_add_test(config, config_main_vertical_letter_offset);
     tcase_add_test(config, config_main_underline_offset);
+    tcase_add_test(config, config_main_box_drawings_uses_font_glyphs);
+    tcase_add_test(config, config_main_dpi_aware);
     tcase_add_test(config, config_main_invalid_option);
     suite_add_tcase(suite, config);
     return suite;
