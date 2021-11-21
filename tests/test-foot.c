@@ -49,7 +49,9 @@ static void
 conf_file_teardown(void)
 {
     if (conf_file.fd >= 0)
-        close(conf_file.fd);
+        ck_assert_int_eq(close(conf_file.fd), 0);
+    if (conf_file.path != NULL)
+        ck_assert_int_eq(unlink(conf_file.path), 0);
 }
 }
 
