@@ -67,6 +67,7 @@ START_TEST(config_invalid_path)
         !config_load(
             &conf, "/invalid-path", &user_notifications, &overrides, true));
 }
+END_TEST
 
 START_TEST(config_empty_config)
 {
@@ -74,6 +75,7 @@ START_TEST(config_empty_config)
         config_load(
             &conf, conf_file.path, &user_notifications, &overrides, true));
 }
+END_TEST
 
 START_TEST(config_invalid_section)
 {
@@ -84,6 +86,7 @@ START_TEST(config_invalid_section)
         !config_load(
             &conf, conf_file.path, &user_notifications, &overrides, true));
 }
+END_TEST
 
 START_TEST(config_main_empty)
 {
@@ -94,6 +97,7 @@ START_TEST(config_main_empty)
         config_load(
             &conf, conf_file.path, &user_notifications, &overrides, true));
 }
+END_TEST
 
 static bool
 add_string_option(const char *section, const char *option, const char *value)
@@ -223,33 +227,39 @@ START_TEST(config_main_shell)
 {
     test_string_option("main", "shell", (const char **)&conf.shell);
 }
+END_TEST
 
 START_TEST(config_main_login_shell)
 {
     test_bool_option("main", "login-shell", &conf.login_shell);
 }
+END_TEST
 
 START_TEST(config_main_line_height)
 {
     test_pt_or_px_option("main", "line-height", &conf.line_height, NULL);
 }
+END_TEST
 
 START_TEST(config_main_letter_spacing)
 {
     test_pt_or_px_option("main", "letter-spacing", &conf.letter_spacing, NULL);
 }
+END_TEST
 
 START_TEST(config_main_horizontal_letter_offset)
 {
     test_pt_or_px_option(
         "main", "horizontal-letter-offset", &conf.horizontal_letter_offset, NULL);
 }
+END_TEST
 
 START_TEST(config_main_vertical_letter_offset)
 {
     test_pt_or_px_option(
         "main", "vertical-letter-offset", &conf.vertical_letter_offset, NULL);
 }
+END_TEST
 
 static bool
 check_underline_offset(bool valid, struct pt_or_px set_value)
@@ -262,12 +272,14 @@ START_TEST(config_main_underline_offset)
     test_pt_or_px_option("main", "underline-offset", &conf.underline_offset,
                          &check_underline_offset);
 }
+END_TEST
 
 START_TEST(config_main_box_drawings_uses_font_glyphs)
 {
     test_bool_option("main", "box-drawings-uses-font-glyphs",
                      &conf.box_drawings_uses_font_glyphs);
 }
+END_TEST
 
 START_TEST(config_main_dpi_aware)
 {
@@ -277,6 +289,7 @@ START_TEST(config_main_dpi_aware)
         (int []){DPI_AWARE_AUTO, DPI_AWARE_YES, DPI_AWARE_NO},
         (const int *)&conf.dpi_aware);
 }
+END_TEST
 
 START_TEST(config_main_invalid_option)
 {
@@ -287,6 +300,7 @@ START_TEST(config_main_invalid_option)
         !config_load(
             &conf, conf_file.path, &user_notifications, &overrides, true));
 }
+END_TEST
 
 static Suite *
 foot_suite(void)
