@@ -53,6 +53,12 @@ conf_file_teardown(void)
     if (conf_file.path != NULL)
         ck_assert_int_eq(unlink(conf_file.path), 0);
 }
+
+static bool
+populate_config(struct file *file, const char *config)
+{
+    const size_t len = strlen(config);
+    return write(file->fd, config, len) == len;
 }
 
 START_TEST(config_invalid_path)
@@ -68,6 +74,15 @@ START_TEST(config_empty_config)
         &conf, conf_file.path, &user_notifications, &overrides, true);
     ck_assert(success);
 }
+
+START_TEST(config_invalid_section)
+{
+    static const char *config = "[invalid-section]\n";
+    ck_assert(populate_config(&conf_file, config));
+
+    bool success = config_load(
+        &conf, conf_file.path, &user_notifications, &overrides, true);
+
     ck_assert(!success);
 }
 
@@ -80,6 +95,7 @@ foot_suite(void)
     tcase_add_checked_fixture(config, &conf_file_setup, &conf_file_teardown);
     tcase_add_test(config, config_invalid_path);
     tcase_add_test(config, config_empty_config);
+    tcase_add_test(config, config_invalid_section);
     suite_add_tcase(suite, config);
     return suite;
 }
