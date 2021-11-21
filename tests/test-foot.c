@@ -118,7 +118,7 @@ test_string_option(const char *section, const char *option, const char **ptr)
 }
 
 static void
-test_bool_option(const char *section, const char *option, bool *ptr)
+test_bool_option(const char *section, const char *option, const bool *ptr)
 {
     ck_assert(add_string_option(section, option, "on"));
     ck_assert(add_string_option(section, option, "true"));
@@ -152,6 +152,36 @@ test_bool_option(const char *section, const char *option, bool *ptr)
             &conf, conf_file.path, &user_notifications, &overrides, true));
 }
 
+static void
+test_pt_or_px_option(const char *section, const char *option,
+                     const struct pt_or_px *ptr)
+{
+    ck_assert(add_string_option(section, option, "13"));
+    ck_assert(
+        config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
+    ck_assert_int_eq(ptr->pt, 13);
+    ck_assert_int_eq(ptr->px, 0);
+
+    config_free(conf);
+    memset(&conf, 0, sizeof(conf));
+
+    ck_assert(add_string_option(section, option, "37px"));
+    ck_assert(
+        config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
+    ck_assert_int_eq(ptr->pt, 0);
+    ck_assert_int_eq(ptr->px, 37);
+
+    config_free(conf);
+    memset(&conf, 0, sizeof(conf));
+
+    ck_assert(add_string_option(section, option, "not-a-pt-or-px"));
+    ck_assert(
+        !config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
+}
+
 START_TEST(config_main_shell)
 {
     test_string_option("main", "shell", (const char **)&conf.shell);
@@ -160,6 +190,11 @@ START_TEST(config_main_shell)
 START_TEST(config_main_login_shell)
 {
     test_bool_option("main", "login-shell", &conf.login_shell);
+}
+
+START_TEST(config_main_line_height)
+{
+    test_pt_or_px_option("main", "line-height", &conf.line_height);
 }
 
 START_TEST(config_main_invalid_option)
@@ -185,6 +220,9 @@ foot_suite(void)
     tcase_add_test(config, config_main_empty);
     tcase_add_test(config, config_main_shell);
     tcase_add_test(config, config_main_login_shell);
+    // TODO: main.font{,-bold,-italic,-bold-italic}
+    // TODO: main.include
+    tcase_add_test(config, config_main_line_height);
     tcase_add_test(config, config_main_invalid_option);
     suite_add_tcase(suite, config);
     return suite;
