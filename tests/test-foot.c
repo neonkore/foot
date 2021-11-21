@@ -55,35 +55,121 @@ conf_file_teardown(void)
 }
 
 static bool
-populate_config(struct file *file, const char *config)
+write_string(const char *config)
 {
     const size_t len = strlen(config);
-    return write(file->fd, config, len) == len;
+    return write(conf_file.fd, config, len) == len;
 }
 
 START_TEST(config_invalid_path)
 {
-    bool success = config_load(
-        &conf, "/invalid-path", &user_notifications, &overrides, true);
-    ck_assert(!success);
+    ck_assert(
+        !config_load(
+            &conf, "/invalid-path", &user_notifications, &overrides, true));
 }
 
 START_TEST(config_empty_config)
 {
-    bool success = config_load(
-        &conf, conf_file.path, &user_notifications, &overrides, true);
-    ck_assert(success);
+    ck_assert(
+        config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
 }
 
 START_TEST(config_invalid_section)
 {
     static const char *config = "[invalid-section]\n";
-    ck_assert(populate_config(&conf_file, config));
+    ck_assert(write_string(config));
 
-    bool success = config_load(
-        &conf, conf_file.path, &user_notifications, &overrides, true);
+    ck_assert(
+        !config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
+}
 
-    ck_assert(!success);
+START_TEST(config_main_empty)
+{
+    static const char *config = "[main]\n";
+    ck_assert(write_string(config));
+
+    ck_assert(
+        config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
+}
+
+static bool
+add_string_option(const char *section, const char *option, const char *value)
+{
+    return write_string("[") &&
+        write_string(section) &&
+        write_string("]\n") &&
+        write_string(option) &&
+        write_string("=") &&
+        write_string(value) &&
+        write_string("\n");
+}
+
+static void
+test_string_option(const char *section, const char *option, const char **ptr)
+{
+    ck_assert(add_string_option(section, option, "a generic string"));
+    ck_assert(
+        config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
+    ck_assert_str_eq(*ptr, "a generic string");
+}
+
+static void
+test_bool_option(const char *section, const char *option, bool *ptr)
+{
+    ck_assert(add_string_option(section, option, "on"));
+    ck_assert(add_string_option(section, option, "true"));
+    ck_assert(add_string_option(section, option, "yes"));
+    ck_assert(add_string_option(section, option, "1"));
+
+    ck_assert(
+        config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
+    ck_assert(*ptr);
+
+    config_free(conf);
+    memset(&conf, 0, sizeof(conf));
+
+    ck_assert(add_string_option(section, option, "off"));
+    ck_assert(add_string_option(section, option, "false"));
+    ck_assert(add_string_option(section, option, "no"));
+    ck_assert(add_string_option(section, option, "0"));
+
+    ck_assert(
+        config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
+    ck_assert(!*ptr);
+
+    config_free(conf);
+    memset(&conf, 0, sizeof(conf));
+
+    ck_assert(add_string_option(section, option, "not-a-boolean"));
+    ck_assert(
+        !config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
+}
+
+START_TEST(config_main_shell)
+{
+    test_string_option("main", "shell", (const char **)&conf.shell);
+}
+
+START_TEST(config_main_login_shell)
+{
+    test_bool_option("main", "login-shell", &conf.login_shell);
+}
+
+START_TEST(config_main_invalid_option)
+{
+    static const char *config = "foo=bar\n";
+    ck_assert(write_string(config));
+
+    ck_assert(
+        !config_load(
+            &conf, conf_file.path, &user_notifications, &overrides, true));
 }
 
 static Suite *
@@ -96,6 +182,10 @@ foot_suite(void)
     tcase_add_test(config, config_invalid_path);
     tcase_add_test(config, config_empty_config);
     tcase_add_test(config, config_invalid_section);
+    tcase_add_test(config, config_main_empty);
+    tcase_add_test(config, config_main_shell);
+    tcase_add_test(config, config_main_login_shell);
+    tcase_add_test(config, config_main_invalid_option);
     suite_add_tcase(suite, config);
     return suite;
 }
