@@ -84,6 +84,7 @@ wayland_cursor = dependency('wayland-cursor')
 xkb = dependency('xkbcommon', version: '>=1.0.0')
 fontconfig = dependency('fontconfig')
 utf8proc = dependency('libutf8proc', required: get_option('grapheme-clustering'))
+check = dependency('check', required: false)
 
 if utf8proc.found()
   add_project_arguments('-DFOOT_GRAPHEME_CLUSTERING=1', language: 'c')
