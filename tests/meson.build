@@ -15,7 +15,7 @@ if check.found()
     '../tokenize.c', '../tokenize.h',
     '../user-notification.c', '../user-notification.h',
     wl_proto_headers,
-    dependencies: [check, pixman, xkb, fcft],
+    dependencies: [check, pixman, xkb, fcft, tllist],
     link_with: [common]
   )
   test('foot', foot_test)
