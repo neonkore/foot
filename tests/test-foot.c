@@ -1,9 +1,20 @@
+#include <stdlib.h>
+#include <unistd.h>
+
 #include <check.h>
+
 #include "../config.h"
 #include "../user-notification.h"
 
+struct file {
+    char *path;
+    int fd;
+};
+
 static struct config conf = {0};
+static struct file conf_file;
 static user_notifications_t user_notifications = tll_init();
+static config_override_t overrides = tll_init();
 
 static void
 conf_setup(void)
@@ -15,24 +26,46 @@ static void
 conf_teardown(void)
 {
     config_free(conf);
-}
-
-static void
-user_notifications_setup(void)
-{
-    ck_assert_int_eq(tll_length(user_notifications), 0);
-}
-
-static void
-user_notifications_teardown(void)
-{
     user_notifications_free(&user_notifications);
+    tll_free(overrides);
+}
+
+static void
+conf_file_setup(void)
+{
+    static char template[] = "/tmp/test-foot-config-file-XXXXXX";
+    int fd = mkstemp(template);
+
+    conf_file.path = NULL;
+    conf_file.fd = -1;
+
+    ck_assert_int_ge(fd, 0);
+
+    conf_file.path = template;
+    conf_file.fd = fd;
+}
+
+static void
+conf_file_teardown(void)
+{
+    if (conf_file.fd >= 0)
+        close(conf_file.fd);
+}
 }
 
 START_TEST(config_invalid_path)
 {
     bool success = config_load(
-        &conf, "/invalid-path", &user_notifications, NULL, true);
+        &conf, "/invalid-path", &user_notifications, &overrides, true);
+    ck_assert(!success);
+}
+
+START_TEST(config_empty_config)
+{
+    bool success = config_load(
+        &conf, conf_file.path, &user_notifications, &overrides, true);
+    ck_assert(success);
+}
     ck_assert(!success);
 }
 
@@ -42,9 +75,9 @@ foot_suite(void)
     Suite *suite = suite_create("foot");
     TCase *config = tcase_create("config");
     tcase_add_checked_fixture(config, &conf_setup, &conf_teardown);
-    tcase_add_checked_fixture(
-        config, &user_notifications_setup, &user_notifications_teardown);
+    tcase_add_checked_fixture(config, &conf_file_setup, &conf_file_teardown);
     tcase_add_test(config, config_invalid_path);
+    tcase_add_test(config, config_empty_config);
     suite_add_tcase(suite, config);
     return suite;
 }
