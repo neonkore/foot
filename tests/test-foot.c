@@ -154,7 +154,9 @@ test_bool_option(const char *section, const char *option, const bool *ptr)
 
 static void
 test_pt_or_px_option(const char *section, const char *option,
-                     const struct pt_or_px *ptr)
+                     const struct pt_or_px *ptr,
+                     bool (*custom_checker)(bool valid,
+                                            struct pt_or_px set_value))
 {
     ck_assert(add_string_option(section, option, "13"));
     ck_assert(
@@ -162,6 +164,9 @@ test_pt_or_px_option(const char *section, const char *option,
             &conf, conf_file.path, &user_notifications, &overrides, true));
     ck_assert_int_eq(ptr->pt, 13);
     ck_assert_int_eq(ptr->px, 0);
+
+    if (custom_checker != NULL)
+        ck_assert(custom_checker(true, (struct pt_or_px){.pt = 13}));
 
     config_free(conf);
     memset(&conf, 0, sizeof(conf));
@@ -173,6 +178,9 @@ test_pt_or_px_option(const char *section, const char *option,
     ck_assert_int_eq(ptr->pt, 0);
     ck_assert_int_eq(ptr->px, 37);
 
+    if (custom_checker != NULL)
+        ck_assert(custom_checker(true, (struct pt_or_px){.px = 37}));
+
     config_free(conf);
     memset(&conf, 0, sizeof(conf));
 
@@ -180,6 +188,9 @@ test_pt_or_px_option(const char *section, const char *option,
     ck_assert(
         !config_load(
             &conf, conf_file.path, &user_notifications, &overrides, true));
+
+    if (custom_checker != NULL)
+        ck_assert(custom_checker(false, (struct pt_or_px){0}));
 }
 
 START_TEST(config_main_shell)
@@ -194,7 +205,36 @@ START_TEST(config_main_login_shell)
 
 START_TEST(config_main_line_height)
 {
-    test_pt_or_px_option("main", "line-height", &conf.line_height);
+    test_pt_or_px_option("main", "line-height", &conf.line_height, NULL);
+}
+
+START_TEST(config_main_letter_spacing)
+{
+    test_pt_or_px_option("main", "letter-spacing", &conf.letter_spacing, NULL);
+}
+
+START_TEST(config_main_horizontal_letter_offset)
+{
+    test_pt_or_px_option(
+        "main", "horizontal-letter-offset", &conf.horizontal_letter_offset, NULL);
+}
+
+START_TEST(config_main_vertical_letter_offset)
+{
+    test_pt_or_px_option(
+        "main", "vertical-letter-offset", &conf.vertical_letter_offset, NULL);
+}
+
+static bool
+check_underline_offset(bool valid, struct pt_or_px set_value)
+{
+    return !valid || conf.use_custom_underline_offset;
+}
+
+START_TEST(config_main_underline_offset)
+{
+    test_pt_or_px_option("main", "underline-offset", &conf.underline_offset,
+                         &check_underline_offset);
 }
 
 START_TEST(config_main_invalid_option)
@@ -223,6 +263,10 @@ foot_suite(void)
     // TODO: main.font{,-bold,-italic,-bold-italic}
     // TODO: main.include
     tcase_add_test(config, config_main_line_height);
+    tcase_add_test(config, config_main_letter_spacing);
+    tcase_add_test(config, config_main_horizontal_letter_offset);
+    tcase_add_test(config, config_main_vertical_letter_offset);
+    tcase_add_test(config, config_main_underline_offset);
     tcase_add_test(config, config_main_invalid_option);
     suite_add_tcase(suite, config);
     return suite;
