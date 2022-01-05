@@ -19,6 +19,7 @@
 #include "osc.h"
 #include "util.h"
 #include "xmalloc.h"
+#include "my-wcwidth.h"
 
 #define UNHANDLED() LOG_DBG("unhandled: %s", esc_as_string(term, final))
 
@@ -619,7 +620,7 @@ chain_key(uint32_t old_key, uint32_t new_wc)
 static void
 action_utf8_print(struct terminal *term, wchar_t wc)
 {
-    int width = wcwidth(wc);
+    int width = my_wcwidth(wc);
     const bool grapheme_clustering = term->conf->tweak.grapheme_shaping;
 
 #if !defined(FOOT_GRAPHEME_CLUSTERING)
@@ -672,7 +673,7 @@ action_utf8_print(struct terminal *term, wchar_t wc)
         }
 #endif
 
-        int base_width = wcwidth(base);
+        int base_width = my_wcwidth(base);
         if (base_width > 0) {
             term->grid->cursor.point.col = col;
             term->grid->cursor.lcf = false;
@@ -686,7 +687,7 @@ action_utf8_print(struct terminal *term, wchar_t wc)
                     term->fonts[0], base, wc, &base_from_primary,
                     &comb_from_primary, &pre_from_primary);
 
-                int precomposed_width = wcwidth(precomposed);
+                int precomposed_width = my_wcwidth(precomposed);
 
                 /*
                  * Only use the pre-composed character if:

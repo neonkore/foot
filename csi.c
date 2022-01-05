@@ -24,6 +24,7 @@
 #include "vt.h"
 #include "xmalloc.h"
 #include "xsnprintf.h"
+#include "my-wcwidth.h"
 
 #define UNHANDLED()        LOG_DBG("unhandled: %s", csi_as_string(term, final, -1))
 #define UNHANDLED_SGR(idx) LOG_DBG("unhandled: %s", csi_as_string(term, 'm', idx))
@@ -742,7 +743,7 @@ csi_dispatch(struct terminal *term, uint8_t final)
                 int count = vt_param_get(term, 0, 1);
                 LOG_DBG("REP: '%lc' %d times", (wint_t)term->vt.last_printed, count);
 
-                const int width = wcwidth(term->vt.last_printed);
+                const int width = my_wcwidth(term->vt.last_printed);
                 if (width > 0) {
                     for (int i = 0; i < count; i++)
                         term_print(term, term->vt.last_printed, width);

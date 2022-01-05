@@ -15,6 +15,7 @@
 #include "util.h"
 #include "wayland.h"
 #include "xmalloc.h"
+#include "my-wcwidth.h"
 
 static void
 enter(void *data, struct zwp_text_input_v3 *zwp_text_input_v3,
@@ -178,7 +179,7 @@ done(void *data, struct zwp_text_input_v3 *zwp_text_input_v3,
     size_t widths[wchars + 1];
 
     for (size_t i = 0; i < wchars; i++) {
-        int width = max(wcwidth(seat->ime.preedit.text[i]), 1);
+        int width = max(my_wcwidth(seat->ime.preedit.text[i]), 1);
         widths[i] = width;
         cell_count += width;
     }

@@ -40,6 +40,7 @@
 #include "url-mode.h"
 #include "util.h"
 #include "xmalloc.h"
+#include "my-wcwidth.h"
 
 #define TIME_SCROLL_DAMAGE 0
 
@@ -627,7 +628,7 @@ render_cell(struct terminal *term, pixman_image_t *pix,
             if (single != NULL) {
                 glyph_count = 1;
                 glyphs = &single;
-                cell_cols = single->cols;
+                cell_cols = my_wcwidth(base);
             }
         }
 
@@ -661,7 +662,7 @@ render_cell(struct terminal *term, pixman_image_t *pix,
             } else {
                 glyph_count = 1;
                 glyphs = &single;
-                cell_cols = single->cols;
+                cell_cols = my_wcwidth(base);
             }
         }
     }
@@ -1414,7 +1415,7 @@ render_ime_preedit_for_seat(struct terminal *term, struct seat *seat,
         if (cell->wc >= CELL_SPACER)
             continue;
 
-        int width = max(1, wcwidth(cell->wc));
+        int width = max(1, my_wcwidth(cell->wc));
         if (col_idx + i + width > term->cols)
             break;
 
@@ -2854,10 +2855,10 @@ render_search_box(struct terminal *term)
     /* Calculate the width of each character */
     int widths[text_len + 1];
     for (size_t i = 0; i < text_len; i++)
-        widths[i] = max(0, wcwidth(text[i]));
+        widths[i] = max(0, my_wcwidth(text[i]));
     widths[text_len] = 0;
 
-    const size_t total_cells = wcswidth(text, text_len);
+    const size_t total_cells = my_wcswidth(text, text_len);
     const size_t wanted_visible_cells = max(20, total_cells);
 
     xassert(term->scale >= 1);
@@ -3288,7 +3289,7 @@ render_urls(struct terminal *term)
         int cols = 0;
 
         for (size_t i = 0; i <= wcslen(label); i++) {
-            int _cols = wcswidth(label, i);
+            int _cols = my_wcswidth(label, i);
 
             if (_cols == (size_t)-1)
                 continue;
