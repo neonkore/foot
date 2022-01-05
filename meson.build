@@ -35,6 +35,14 @@ add_project_arguments(
   language: 'c',
 )
 
+if get_option('system-wcwidth')
+  wcwidth_method = 'system'
+  add_project_arguments('-DFOOT_SYSTEM_WCWIDTH=1', language: 'c')
+else
+  wcwidth_method = 'builtin'
+  add_project_arguments('-DFOOT_SYSTEM_WCWIDTH=0', language: 'c')
+endif
+
 terminfo_install_location = get_option('custom-terminfo-install-location')
 
 if terminfo_install_location != ''
@@ -136,6 +144,15 @@ version = custom_target(
   output: 'version.h',
   command: [env, 'LC_ALL=C', generate_version_sh, meson.project_version(), '@CURRENT_SOURCE_DIR@', '@OUTPUT@'])
 
+python = find_program('python3', native: true)
+generate_wcwidth_py = files('scripts/generate-wcwidth.py')
+wcwidth_tables = custom_target(
+  'generate_wcwidth',
+  output: 'my-wcwidth-tables.h',
+  input: ['unicode/DerivedGeneralCategory.txt',
+          'unicode/EastAsianWidth.txt'],
+  command: [env, 'LC_ALL=C', python, generate_wcwidth_py, '@INPUT0@', '@INPUT1@', '@OUTPUT@'])
+
 common = static_library(
   'common',
   'log.c', 'log.h',
@@ -149,6 +166,7 @@ misc = static_library(
   'hsl.c', 'hsl.h',
   'macros.h',
   'misc.c', 'misc.h',
+  'my-wcwidth.c', 'my-wcwidth.h', wcwidth_tables,
   'uri.c', 'uri.h'
 )
 
@@ -280,6 +298,7 @@ summary(
     'Themes': get_option('themes'),
     'IME': get_option('ime'),
     'Grapheme clustering': utf8proc.found(),
+    'wcwidth()': wcwidth_method,
     'Build terminfo': tic.found(),
     'Terminfo install location': terminfo_install_location,
     'Default TERM': get_option('default-terminfo'),

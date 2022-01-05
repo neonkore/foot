@@ -10,6 +10,9 @@ option('ime', type: 'boolean', value: true,
 option('grapheme-clustering', type: 'feature',
        description: 'Enables grapheme clustering using libutf8proc. Requires fcft with harfbuzz support to be useful.')
 
+option('system-wcwidth', type: 'boolean', value: false,
+       description: 'Use the system’s (e.g. glibc or musl) wcwidth(). Foot’s builtin i susually more up-to-date with the latest Unicode specification, but using the system’s version reduces the size of the foot binary.')
+
 option('terminfo', type: 'feature', value: 'enabled', description: 'Build and install foot\'s terminfo files.')
 option('default-terminfo', type: 'string', value: 'foot',
        description: 'Default value of the "term" option in foot.ini.')
