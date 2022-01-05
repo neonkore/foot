@@ -37,3 +37,12 @@ static inline bool feature_graphemes(void)
     return false;
 #endif
 }
+
+static inline bool feature_builtin_wcwidth(void)
+{
+#if FOOT_SYSTEM_WCWIDTH == 0
+    return true;
+#else
+    return false;
+#endif
+}
