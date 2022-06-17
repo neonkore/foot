@@ -283,6 +283,11 @@ default) available; see *foot.ini*(5).
 *wheel*
 	Scroll up/down in history
 
+*alt*+*left*
+	Launch URL under the mouse pointer. Note that there are no visual
+	cues when hovering URLs (the primary way to launch URLs in foot is
+	via _URL mode_; see the *URLs* section).
+
 # FONT FORMAT
 
 The font is specified in FontConfig syntax. That is, a colon-separated
