@@ -245,6 +245,12 @@ These are the default shortcuts. See `man foot.ini` and the example
 <kbd>wheel</kbd>
 : Scroll up/down in history
 
+<kbd>alt</kbd>+<kbd>left</kbd>
+
+: Launch URL under the mouse pointer. Note that there are no visual
+  cues when hovering URLs (the primary way to launch URLs in foot is
+  via [_URL mode_](#urls)).
+
 
 ## Server (daemon) mode
 
