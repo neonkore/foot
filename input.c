@@ -454,6 +454,41 @@ execute_binding(struct seat *seat, struct terminal *term,
             term, seat->mouse.col, seat->mouse.row, SELECTION_LINE_WISE, false);
         return true;
 
+    case BIND_ACTION_LAUNCH_URL: {
+        const int m_row = seat->mouse.row;
+        const int m_col = seat->mouse.col;
+
+        if (m_col >= 0 && m_row >= 0) {
+            url_list_t urls = tll_init();
+            urls_collect(term, URL_ACTION_LAUNCH, &urls);
+
+            tll_foreach(urls, it) {
+                const struct url *url = &it->item;
+                const int start_row = url->range.start.row;
+                const int start_col = url->range.start.col;
+                const int end_row = url->range.end.row;
+                const int end_col = url->range.end.col;
+
+                bool start_is_before_point =
+                    start_row < m_row ||
+                    (start_row == m_row && start_col <= m_col);
+
+                bool end_is_after_point =
+                    end_row > m_row ||
+                    (end_row == m_row && end_col >= m_col);
+
+                if (start_is_before_point && end_is_after_point) {
+                    url_activate(seat, term, url, serial);
+                    break;
+                }
+            }
+
+            url_list_destroy(&urls);
+        }
+
+        return true;
+    }
+
     case BIND_ACTION_COUNT:
         BUG("Invalid action type");
         return false;

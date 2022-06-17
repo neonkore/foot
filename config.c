@@ -126,6 +126,7 @@ static const char *const binding_action_map[] = {
     [BIND_ACTION_SELECT_WORD] = "select-word",
     [BIND_ACTION_SELECT_WORD_WS] = "select-word-whitespace",
     [BIND_ACTION_SELECT_ROW] = "select-row",
+    [BIND_ACTION_LAUNCH_URL] = "launch-url",
 };
 
 static const char *const search_binding_action_map[] = {
@@ -2745,6 +2746,7 @@ add_default_mouse_bindings(struct config *conf)
         {BIND_ACTION_SELECT_WORD, m_none, {.m = {BTN_LEFT, 2}}},
         {BIND_ACTION_SELECT_WORD_WS, m_ctrl, {.m = {BTN_LEFT, 2}}},
         {BIND_ACTION_SELECT_ROW, m_none, {.m = {BTN_LEFT, 3}}},
+        {BIND_ACTION_LAUNCH_URL, m_alt, {.m = {BTN_LEFT, 1}}},
     };
 
     conf->bindings.mouse.count = ALEN(bindings);
