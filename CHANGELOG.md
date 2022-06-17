@@ -50,10 +50,15 @@
 * Support for jumping to previous/next prompt (requires shell
   integration). By default bound to `ctrl`+`shift`+`z` and
   `ctrl`+`shift`+`x` respectively ([#30][30]).
+* New mouse binding, `launch-url`, that lets you launch URLs by
+  clicking on them. Bound to `alt`+`BTN_LEFT` by default. Note that
+  there is no highlighting, markup, or any other visual cues when
+  hovering URLs. ([#1028][1028]).
 
 [1058]: https://codeberg.org/dnkl/foot/issues/1058
 [1070]: https://codeberg.org/dnkl/foot/issues/1070
 [30]: https://codeberg.org/dnkl/foot/issues/30
+[1028]: https://codeberg.org/dnkl/foot/issues/1028
 
 
 ### Changed
