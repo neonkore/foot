@@ -994,6 +994,11 @@ actions listed under *key-bindings* can be used here as well.
 *primary-paste*
 	Pastes from the _primary selection_. Default: _BTN\_MIDDLE_.
 
+*launch-url*
+	Launch the URL (with the program specified by *url.launch*) under
+	the mouse pointer. Note that there are no visual cues when
+	hovering URLs. Default: _Mod1+BTN\_LEFT_.
+
 # TWEAK
 
 This section is for advanced users and describes configuration options
