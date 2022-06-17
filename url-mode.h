@@ -15,6 +15,9 @@ static inline bool urls_mode_is_active(const struct terminal *term)
 
 void urls_collect(
     const struct terminal *term, enum url_action action, url_list_t *urls);
+
+void url_activate(struct seat *seat, struct terminal *term,
+                  const struct url *url, uint32_t serial);
 void urls_assign_key_combos(const struct config *conf, url_list_t *urls);
 
 void urls_render(struct terminal *term);

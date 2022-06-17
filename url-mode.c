@@ -127,8 +127,8 @@ spawn_url_launcher(struct seat *seat, struct terminal *term, const char *url,
     return spawn_url_launcher_with_token(term, url, NULL);
 }
 
-static void
-activate_url(struct seat *seat, struct terminal *term, const struct url *url,
+void
+url_activate(struct seat *seat, struct terminal *term, const struct url *url,
              uint32_t serial)
 {
     char *url_string = NULL;
@@ -262,7 +262,7 @@ urls_input(struct seat *seat, struct terminal *term,
     }
 
     if (match) {
-        activate_url(seat, term, match, serial);
+        url_activate(seat, term, match, serial);
 
         switch (match->action) {
         case URL_ACTION_COPY:
