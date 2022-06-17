@@ -827,6 +827,15 @@ url_destroy(struct url *url)
 }
 
 void
+url_list_destroy(url_list_t *urls)
+{
+    tll_foreach(*urls, it) {
+        url_destroy(&it->item);
+        tll_remove(*urls, it);
+    }
+}
+
+void
 urls_reset(struct terminal *term)
 {
     if (likely(tll_length(term->urls) == 0)) {
@@ -855,11 +864,9 @@ urls_reset(struct terminal *term)
         }
     }
 
-    tll_foreach(term->urls, it) {
+    tll_foreach(term->urls, it)
         tag_cells_for_url(term, &it->item, false);
-        url_destroy(&it->item);
-        tll_remove(term->urls, it);
-    }
+    url_list_destroy(&term->urls);
 
     term->urls_show_uri_on_jump_label = false;
     memset(term->url_keys, 0, sizeof(term->url_keys));

@@ -18,6 +18,9 @@ void urls_collect(
 
 void url_activate(struct seat *seat, struct terminal *term,
                   const struct url *url, uint32_t serial);
+
+void url_list_destroy(url_list_t *urls);
+
 void urls_assign_key_combos(const struct config *conf, url_list_t *urls);
 
 void urls_render(struct terminal *term);
