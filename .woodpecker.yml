@@ -51,14 +51,18 @@ pipeline:
       - cd ../..
 
       # Release
+      # - mkdir -p bld/release-x64
+      # - cd bld/release-x64
+      # - meson --buildtype=release -Db_pgo=generate -Dgrapheme-clustering=enabled -Dfcft:grapheme-shaping=enabled -Dfcft:run-shaping=enabled  -Dfcft:test-text-shaping=true ../..
+      # - ninja -v -k0
+      # - ninja -v test
+      # - ./foot --version
+      # - ./footclient --version
+      # - cd ../..
+
+      # Partial PGO
       - mkdir -p bld/release-x64
-      - cd bld/release-x64
-      - meson --buildtype=release -Db_pgo=generate -Dgrapheme-clustering=enabled -Dfcft:grapheme-shaping=enabled -Dfcft:run-shaping=enabled  -Dfcft:test-text-shaping=true ../..
-      - ninja -v -k0
-      - ninja -v test
-      - ./foot --version
-      - ./footclient --version
-      - cd ../..
+      - ./pgo/pgo.sh partial . bld/release-x64 -Dgrapheme-clustering=enabled -Dfcft:grapheme-shaping=enabled -Dfcft:run-shaping=enabled  -Dfcft:test-text-shaping=true
 
       # no grapheme clustering
       - apk del harfbuzz harfbuzz-dev utf8proc utf8proc-dev
