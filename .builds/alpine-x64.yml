@@ -42,10 +42,8 @@ tasks:
       ninja -C bld/debug -k0
       meson test -C bld/debug --print-errorlogs
   - release: |
-      mkdir -p bld/release
-      meson --buildtype=minsize -Db_pgo=generate -Dgrapheme-clustering=enabled -Dfcft:grapheme-shaping=enabled -Dfcft:run-shaping=enabled  -Dfcft:test-text-shaping=true foot bld/release
-      ninja -C bld/release -k0
-      meson test -C bld/release --print-errorlogs
+      mkdir -p bld/release-with-pgo
+      ./foot/pgo/pgo.sh partial foot bld/release-with-pgo -Dgrapheme-clustering=enabled -Dfcft:grapheme-shaping=enabled -Dfcft:run-shaping=enabled  -Dfcft:test-text-shaping=true
   - codespell: |
       pip install codespell
       cd foot
