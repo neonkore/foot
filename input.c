@@ -359,7 +359,7 @@ execute_binding(struct seat *seat, struct terminal *term,
             const struct row *row = grid->rows[r_abs];
             xassert(row != NULL);
 
-            if (!row->prompt_marker)
+            if (!row->shell_integration.prompt_marker)
                 continue;
 
             grid->view = r_abs;
@@ -391,7 +391,7 @@ execute_binding(struct seat *seat, struct terminal *term,
             const struct row *row = grid->rows[r_abs];
             xassert(row != NULL);
 
-            if (!row->prompt_marker) {
+            if (!row->shell_integration.prompt_marker) {
                 if (r_abs == grid->offset + term->rows - 1) {
                     /* We’ve reached the bottom of the scrollback */
                     break;
