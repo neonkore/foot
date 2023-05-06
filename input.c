@@ -2410,8 +2410,7 @@ wl_pointer_button(void *data, struct wl_pointer *wl_pointer,
                             continue;
                         }
 
-                        const struct config_key_modifiers no_mods = {0};
-                        if (memcmp(&binding->modifiers, &no_mods, sizeof(no_mods)) != 0) {
+                        if (tll_length(binding->modifiers) > 0) {
                             /* Binding has modifiers */
                             continue;
                         }
